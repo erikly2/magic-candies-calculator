@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Candies Calculator</title>
+    <script>
+        function calculateCandies(level) {
+            const candiesRequired = {
+                10: 100, // Replace with actual values if available
+                20: 300, // Replace with actual values if available
+                30: 600  // Replace with actual values if available
+            };
+
+            const result = candiesRequired[level] || "Invalid selection";
+            document.getElementById("result").innerText = `You need ${result} magic candies for +${level}.`;
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Magic Candies Calculator</h1>
+    <p>Select the level to calculate the required magic candies:</p>
+    <button class="button" onclick="calculateCandies(10)">+10</button>
+    <button class="button" onclick="calculateCandies(20)">+20</button>
+    <button class="button" onclick="calculateCandies(30)">+30</button>
+
+    <div id="result"></div>
+</body>
+</html>
