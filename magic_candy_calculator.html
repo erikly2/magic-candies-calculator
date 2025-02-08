@@ -12,8 +12,29 @@
                 30: 600  // Replace with actual values if available
             };
 
-            const result = candiesRequired[level] || "Invalid selection";
-            document.getElementById("result").innerText = `You need ${result} magic candies for +${level}.`;
+            const currentLevel = parseInt(document.getElementById("currentLevel").value) || 0;
+            const currentCandies = parseInt(document.getElementById("CurrentCandies").value) || 0;
+
+            if (currentLevel >= level) {
+                document.getElementById("result").innerText = `You have already reached level +${level}.`;
+                return;
+            }
+
+            const candiesNeeded = candiesRequired[level] - candiesRequired[currentLevel] - currentCandies;
+            const result = candiesNeeded > 0 ? `You need ${candiesNeeded} more magic candies to reach +${level}.`
+            : `You already have enough candies to reach +${level}.`;
+
+            document.getElementById("result").innerText = result;
+        }
+
+        function updateLevel(change) {
+            let currentLevel = parseInt(document.getElementById("currentLevel").value) || 0;
+            const newLevel = currentLevel + change;
+            
+            if (newLevel >= 0 && newLevel <= 30) {
+                document.getElementById("currentLevel").value = newLevel;
+                document.getElementById("decreaseLevel").disabled = (newLevel === 0);
+            }
         }
     </script>
     <style>
@@ -43,10 +64,49 @@
             font-size: 18px;
             color: #333;
         }
+
+        .input-container {
+            margin: 20px 0;
+        }
+
+        .input-container label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .input-container input {
+            padding: 5px;
+            font-size: 16px;
+            width: 100px;
+            text-align: center;
+        }
+
+        .level-controls button {
+            font-size: 16px;
+            padding: 5px 10px;
+            margin: 5px;
+        }
+
+        .level-controls button:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
     <h1>Magic Candies Calculator</h1>
+    <p>Enter your current level and the number of magic candies you have:</p>
+    <div class="input-container">
+        <label for="currentLevel">Current Level:</label>
+        <button class="level-controls" id="decreaseLevel" onclick="updateLevel(-1)" disabled>-</button>
+        <input type="number" id="currentLevel" min="0" max="30" value="0" readonly>
+        <button class="level-controls" onclick="updateLevel(1)">+</button>
+    </div>
+    <div class="input-container">
+        <label for="currentCandies">Current Candies:</label>
+        <input type="number" id="currentCandies" min="0" placeholder="e.g., 50">
+    </div>
+
     <p>Select the level to calculate the required magic candies:</p>
     <button class="button" onclick="calculateCandies(10)">+10</button>
     <button class="button" onclick="calculateCandies(20)">+20</button>
@@ -55,3 +115,4 @@
     <div id="result"></div>
 </body>
 </html>
+
