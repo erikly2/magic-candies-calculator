@@ -1,127 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Magic Candies Calculator</title>
     <script>
-        function calculateCandies() {
-            const candiesRequired = {
-                10: 100, 
-                20: 300, 
-                30: 600  
-            };
+      const candiesRequired = {
+        10: 100,
+        20: 300,
+        30: 600,
+      };
 
-            const currentLevel = parseInt(document.getElementById("currentLevel").value) || 0;
-            const targetLevel = parseInt(document.getElementById("targetLevel").value) || 0;
-            const currentCandies = parseInt(document.getElementById("currentCandies").value) || 0;
+      function calculateCandies(cookie) {
+        const currentLevel =
+          parseInt(document.getElementById(`currentLevel_${cookie}`).value) ||
+          0;
+        const targetLevel =
+          parseInt(document.getElementById(`targetLevel_${cookie}`).value) || 0;
+        const currentCandies =
+          parseInt(document.getElementById(`currentCandies_${cookie}`).value) ||
+          0;
 
-            if (currentLevel >= targetLevel) {
-                document.getElementById("result").innerText = `You have already reached or exceeded level +${targetLevel}.`;
-                return;
-            }
-
-            const candiesNeeded = (candiesRequired[targetLevel] || 0) - (candiesRequired[currentLevel] || 0) - currentCandies;
-            const result = candiesNeeded > 0 
-                ? `You need ${candiesNeeded} more magic candies to reach +${targetLevel}.` 
-                : `You already have enough candies to reach +${targetLevel}!`;
-
-            document.getElementById("result").innerText = result;
+        if (currentLevel >= targetLevel) {
+          document.getElementById(
+            `result_${cookie}`
+          ).innerText = `You have already reached or exceeded level +${targetLevel}.`;
+          return;
         }
 
-        function updateLevel(change) {
-            const currentLevel = parseInt(document.getElementById("currentLevel").value) || 0;
-            let targetLevel = parseInt(document.getElementById("targetLevel").value) || currentLevel;
-            const newLevel = targetLevel + change;
-            
-            if (newLevel >= currentLevel && newLevel <= 30) {
-                document.getElementById("targetLevel").value = newLevel;
-                document.getElementById("decreaseLevel").disabled = (newLevel === currentLevel);
-            }
-        }
+        const candiesNeeded =
+          (candiesRequired[targetLevel] || 0) -
+          (candiesRequired[currentLevel] || 0) -
+          currentCandies;
+        const result =
+          candiesNeeded > 0
+            ? `You need ${candiesNeeded} more magic candies to reach +${targetLevel}.`
+            : `You already have enough candies to reach +${targetLevel}!`;
 
-        function syncTargetWithCurrent() {
-            const currentLevel = parseInt(document.getElementById("currentLevel").value) || 0;
-            document.getElementById("targetLevel").value = currentLevel;
-            document.getElementById("decreaseLevel").disabled = true;
+        document.getElementById(`result_${cookie}`).innerText = result;
+      }
+
+      function updateLevel(cookie, change) {
+        const currentLevel =
+          parseInt(document.getElementById(`currentLevel_${cookie}`).value) ||
+          0;
+        let targetLevel =
+          parseInt(document.getElementById(`targetLevel_${cookie}`).value) ||
+          currentLevel;
+        const newLevel = targetLevel + change;
+
+        if (newLevel >= currentLevel && newLevel <= 30) {
+          document.getElementById(`targetLevel_${cookie}`).value = newLevel;
+          document.getElementById(`decreaseLevel_${cookie}`).disabled =
+            newLevel === currentLevel;
         }
+      }
+
+      function syncTargetWithCurrent(cookie) {
+        const currentLevel =
+          parseInt(document.getElementById(`currentLevel_${cookie}`).value) ||
+          0;
+        document.getElementById(`targetLevel_${cookie}`).value = currentLevel;
+        document.getElementById(`decreaseLevel_${cookie}`).disabled = true;
+      }
     </script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-            border-radius: 5px;
-        }
-
-        .button:hover {
-            background-color: #45a049;
-        }
-
-        #result {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #333;
-        }
-
-        .input-container {
-            margin: 20px 0;
-        }
-
-        .input-container label {
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
-        .input-container input {
-            padding: 5px;
-            font-size: 16px;
-            width: 100px;
-            text-align: center;
-        }
-
-        .level-controls button {
-            font-size: 16px;
-            padding: 5px 10px;
-            margin: 5px;
-        }
-
-        .level-controls button:disabled {
-            background-color: grey;
-            cursor: not-allowed;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      .tab {
+        display: none;
+      }
+      .active {
+        display: block;
+      }
+      .button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 5px;
+        border-radius: 5px;
+      }
+      .button:hover {
+        background-color: #45a049;
+      }
+      .level-controls button:disabled {
+        background-color: grey;
+        cursor: not-allowed;
+      }
     </style>
-</head>
-<body onload="syncTargetWithCurrent()">
+  </head>
+  <body>
     <h1>Magic Candies Calculator</h1>
-    <p>Enter your current level and the number of magic candies you have:</p>
-    <div class="input-container">
-        <label for="currentLevel">Current Level:</label>
-        <input type="number" id="currentLevel" min="0" max="30" value="0" onchange="syncTargetWithCurrent()">
-    </div>
-    <div class="input-container">
-        <label for="currentCandies">Current Candies:</label>
-        <input type="number" id="currentCandies" min="0" value="0">
-    </div>
-    <div class="input-container">
-        <label for="targetLevel">Target Level:</label>
-        <button class="level-controls" id="decreaseLevel" onclick="updateLevel(-1)" disabled>-</button>
-        <input type="number" id="targetLevel" min="0" max="30" value="0" readonly>
-        <button class="level-controls" onclick="updateLevel(1)">+</button>
+    <div>
+      <select id="cookieSelector" onchange="changeTab()">
+        <option value="">Select a Cookie</option>
+        <script>
+          for (let i = 1; i <= 31; i++) {
+            document.write(`<option value="cookie${i}">Cookie ${i}</option>`);
+          }
+        </script>
+      </select>
     </div>
 
-    <p><button class="button" onclick="calculateCandies()">Calculate</button></p>
+    <div id="tabs">
+      <script>
+        for (let i = 1; i <= 31; i++) {
+          document.write(`
+                    <div id="cookie${i}" class="tab">
+                        <h2>Cookie ${i}</h2>
+                        <div class="input-container">
+                            <label for="currentLevel_${i}">Current Level:</label>
+                            <input type="number" id="currentLevel_${i}" min="0" max="30" value="0" onchange="syncTargetWithCurrent(${i})">
+                        </div>
+                        <div class="input-container">
+                            <label for="currentCandies_${i}">Current Candies:</label>
+                            <input type="number" id="currentCandies_${i}" min="0" value="0">
+                        </div>
+                        <div class="input-container">
+                            <label for="targetLevel_${i}">Target Level:</label>
+                            <button class="level-controls" id="decreaseLevel_${i}" onclick="updateLevel(${i}, -1)" disabled>-</button>
+                            <input type="number" id="targetLevel_${i}" min="0" max="30" value="0" readonly>
+                            <button class="level-controls" onclick="updateLevel(${i}, 1)">+</button>
+                        </div>
+                        <p><button class="button" onclick="calculateCandies(${i})">Calculate</button></p>
+                        <div id="result_${i}"></div>
+                    </div>
+                `);
+        }
+      </script>
+    </div>
 
-    <div id="result"></div>
-</body>
+    <script>
+      function changeTab() {
+        let selectedCookie = document.getElementById("cookieSelector").value;
+        let tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+        if (selectedCookie) {
+          document.getElementById(selectedCookie).classList.add("active");
+        }
+      }
+    </script>
+  </body>
 </html>
