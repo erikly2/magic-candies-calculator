@@ -18,13 +18,23 @@
       };
 
       let cookieData = {};
-      let globalMaterials = { sugarCrystals: 0, soulEssence: 0 };
+      let globalMaterials = {
+        sugarCrystals: [0, 0, 0],
+        soulEssence: [0, 0, 0, 0],
+      };
 
       function updateGlobalMaterials() {
-        globalMaterials.sugarCrystals =
-          parseInt(document.getElementById("globalSugarCrystals").value) || 0;
-        globalMaterials.soulEssence =
-          parseInt(document.getElementById("globalSoulEssence").value) || 0;
+        globalMaterials.sugarCrystals = [
+          parseInt(document.getElementById("globalSugarCrystals1").value) || 0,
+          parseInt(document.getElementById("globalSugarCrystals2").value) || 0,
+          parseInt(document.getElementById("globalSugarCrystals3").value) || 0,
+        ];
+        globalMaterials.soulEssence = [
+          parseInt(document.getElementById("globalSoulEssence1").value) || 0,
+          parseInt(document.getElementById("globalSoulEssence2").value) || 0,
+          parseInt(document.getElementById("globalSoulEssence3").value) || 0,
+          parseInt(document.getElementById("globalSoulEssence4").value) || 0,
+        ];
       }
 
       function calculateCandies(cookie) {
@@ -56,9 +66,11 @@
           (materialsRequired[currentLevel]?.soulEssence || 0);
 
         const remainingSugarCrystals =
-          globalMaterials.sugarCrystals - sugarCrystalsNeeded;
+          globalMaterials.sugarCrystals.reduce((acc, curr) => acc + curr, 0) -
+          sugarCrystalsNeeded;
         const remainingSoulEssence =
-          globalMaterials.soulEssence - soulEssenceNeeded;
+          globalMaterials.soulEssence.reduce((acc, curr) => acc + curr, 0) -
+          soulEssenceNeeded;
 
         document.getElementById(`result_${cookie}`).innerHTML = `
                 You need ${
@@ -162,25 +174,77 @@
     <div class="content">
       <h1>Magic Candies Calculator</h1>
       <div>
-        <label for="globalSugarCrystals">Sugar Crystals:</label>
+        <label for="globalSugarCrystals1">Sugar Crystals 1:</label>
         <input
           type="number"
-          id="globalSugarCrystals"
+          id="globalSugarCrystals1"
           min="0"
           value="0"
           onchange="updateGlobalMaterials()"
         />
       </div>
       <div>
-        <label for="globalSoulEssence">Soul Essence:</label>
+        <label for="globalSugarCrystals2">Sugar Crystals 2:</label>
         <input
           type="number"
-          id="globalSoulEssence"
+          id="globalSugarCrystals2"
           min="0"
           value="0"
           onchange="updateGlobalMaterials()"
         />
       </div>
+      <div>
+        <label for="globalSugarCrystals3">Sugar Crystals 3:</label>
+        <input
+          type="number"
+          id="globalSugarCrystals3"
+          min="0"
+          value="0"
+          onchange="updateGlobalMaterials()"
+        />
+      </div>
+
+      <div>
+        <label for="globalSoulEssence1">Soul Essence 1:</label>
+        <input
+          type="number"
+          id="globalSoulEssence1"
+          min="0"
+          value="0"
+          onchange="updateGlobalMaterials()"
+        />
+      </div>
+      <div>
+        <label for="globalSoulEssence2">Soul Essence 2:</label>
+        <input
+          type="number"
+          id="globalSoulEssence2"
+          min="0"
+          value="0"
+          onchange="updateGlobalMaterials()"
+        />
+      </div>
+      <div>
+        <label for="globalSoulEssence3">Soul Essence 3:</label>
+        <input
+          type="number"
+          id="globalSoulEssence3"
+          min="0"
+          value="0"
+          onchange="updateGlobalMaterials()"
+        />
+      </div>
+      <div>
+        <label for="globalSoulEssence4">Soul Essence 4:</label>
+        <input
+          type="number"
+          id="globalSoulEssence4"
+          min="0"
+          value="0"
+          onchange="updateGlobalMaterials()"
+        />
+      </div>
+
       <div id="cookie_panels">
         <script>
           for (let i = 1; i <= 31; i++) {
