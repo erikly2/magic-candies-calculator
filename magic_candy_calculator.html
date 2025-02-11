@@ -11,6 +11,22 @@
         30: 600,
       };
 
+      const materialsRequired = {
+        10: { sugarCrystals: 50, soulEssence: 20 },
+        20: { sugarCrystals: 150, soulEssence: 60 },
+        30: { sugarCrystals: 300, soulEssence: 120 },
+      };
+
+      let cookieData = {};
+      let globalMaterials = { sugarCrystals: 0, soulEssence: 0 };
+
+      function updateGlobalMaterials() {
+        globalMaterials.sugarCrystals =
+          parseInt(document.getElementById("globalSugarCrystals").value) || 0;
+        globalMaterials.soulEssence =
+          parseInt(document.getElementById("globalSoulEssence").value) || 0;
+      }
+
       function calculateCandies(cookie) {
         const currentLevel =
           parseInt(document.getElementById(`currentLevel_${cookie}`).value) ||
@@ -32,27 +48,42 @@
           (candiesRequired[targetLevel] || 0) -
           (candiesRequired[currentLevel] || 0) -
           currentCandies;
-        const result =
-          candiesNeeded > 0
-            ? `You need ${candiesNeeded} more magic candies to reach +${targetLevel}.`
-            : `You already have enough candies to reach +${targetLevel}!`;
+        const sugarCrystalsNeeded =
+          (materialsRequired[targetLevel]?.sugarCrystals || 0) -
+          (materialsRequired[currentLevel]?.sugarCrystals || 0);
+        const soulEssenceNeeded =
+          (materialsRequired[targetLevel]?.soulEssence || 0) -
+          (materialsRequired[currentLevel]?.soulEssence || 0);
 
-        document.getElementById(`result_${cookie}`).innerText = result;
+        const remainingSugarCrystals =
+          globalMaterials.sugarCrystals - sugarCrystalsNeeded;
+        const remainingSoulEssence =
+          globalMaterials.soulEssence - soulEssenceNeeded;
+
+        document.getElementById(`result_${cookie}`).innerHTML = `
+                You need ${
+                  candiesNeeded > 0 ? candiesNeeded : 0
+                } more magic candies.<br>
+                You need ${
+                  sugarCrystalsNeeded > 0 ? sugarCrystalsNeeded : 0
+                } more Sugar Crystals (Remaining: ${remainingSugarCrystals}).<br>
+                You need ${
+                  soulEssenceNeeded > 0 ? soulEssenceNeeded : 0
+                } more Soul Essence (Remaining: ${remainingSoulEssence}).
+            `;
       }
 
       function updateLevel(cookie, change) {
-        const currentLevel =
-          parseInt(document.getElementById(`currentLevel_${cookie}`).value) ||
-          0;
         let targetLevel =
           parseInt(document.getElementById(`targetLevel_${cookie}`).value) ||
-          currentLevel;
+          cookieData[cookie].currentLevel;
         const newLevel = targetLevel + change;
 
-        if (newLevel >= currentLevel && newLevel <= 30) {
+        if (newLevel >= cookieData[cookie].currentLevel && newLevel <= 30) {
           document.getElementById(`targetLevel_${cookie}`).value = newLevel;
           document.getElementById(`decreaseLevel_${cookie}`).disabled =
-            newLevel === currentLevel;
+            newLevel === cookieData[cookie].currentLevel;
+          cookieData[cookie].targetLevel = newLevel;
         }
       }
 
@@ -62,32 +93,48 @@
           0;
         document.getElementById(`targetLevel_${cookie}`).value = currentLevel;
         document.getElementById(`decreaseLevel_${cookie}`).disabled = true;
+        cookieData[cookie].currentLevel = currentLevel;
+        cookieData[cookie].targetLevel = currentLevel;
+      }
+
+      function showCookie(cookie) {
+        document
+          .querySelectorAll(".cookie-panel")
+          .forEach((panel) => (panel.style.display = "none"));
+        document.getElementById(`cookie_${cookie}`).style.display = "block";
       }
     </script>
     <style>
       body {
         font-family: Arial, sans-serif;
-        text-align: center;
+        display: flex;
+        flex-direction: row;
+      }
+      .sidebar {
+        width: 200px;
+        background: #f4f4f4;
+        padding: 10px;
+        height: 100vh;
+        overflow-y: auto;
+      }
+      .sidebar button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 5px;
+        border: none;
+        background: #ddd;
+        cursor: pointer;
+      }
+      .sidebar button:hover {
+        background: #bbb;
+      }
+      .content {
+        flex-grow: 1;
         padding: 20px;
       }
-      .tab {
+      .cookie-panel {
         display: none;
-      }
-      .active {
-        display: block;
-      }
-      .button {
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        margin: 5px;
-        border-radius: 5px;
-      }
-      .button:hover {
-        background-color: #45a049;
       }
       .level-controls button:disabled {
         background-color: grey;
@@ -96,55 +143,65 @@
     </style>
   </head>
   <body>
-    <h1>Magic Candies Calculator</h1>
-    <div>
-      <select id="cookieSelector" onchange="changeTab()">
-        <option value="">Select a Cookie</option>
-        <script>
-          for (let i = 1; i <= 31; i++) {
-            document.write(`<option value="cookie${i}">Cookie ${i}</option>`);
-          }
-        </script>
-      </select>
-    </div>
-
-    <div id="tabs">
+    <div class="sidebar">
+      <h3>Cookies</h3>
       <script>
         for (let i = 1; i <= 31; i++) {
-          document.write(`
-                    <div id="cookie${i}" class="tab">
-                        <h2>Cookie ${i}</h2>
-                        <div class="input-container">
-                            <label for="currentLevel_${i}">Current Level:</label>
-                            <input type="number" id="currentLevel_${i}" min="0" max="30" value="0" onchange="syncTargetWithCurrent(${i})">
-                        </div>
-                        <div class="input-container">
-                            <label for="currentCandies_${i}">Current Candies:</label>
-                            <input type="number" id="currentCandies_${i}" min="0" value="0">
-                        </div>
-                        <div class="input-container">
-                            <label for="targetLevel_${i}">Target Level:</label>
-                            <button class="level-controls" id="decreaseLevel_${i}" onclick="updateLevel(${i}, -1)" disabled>-</button>
-                            <input type="number" id="targetLevel_${i}" min="0" max="30" value="0" readonly>
-                            <button class="level-controls" onclick="updateLevel(${i}, 1)">+</button>
-                        </div>
-                        <p><button class="button" onclick="calculateCandies(${i})">Calculate</button></p>
-                        <div id="result_${i}"></div>
-                    </div>
-                `);
+          cookieData[`cookie${i}`] = {
+            currentLevel: 0,
+            targetLevel: 0,
+            candies: 0,
+          };
+          document.write(
+            `<button onclick="showCookie('cookie${i}')">Cookie ${i}</button>`
+          );
         }
       </script>
     </div>
 
-    <script>
-      function changeTab() {
-        let selectedCookie = document.getElementById("cookieSelector").value;
-        let tabs = document.querySelectorAll(".tab");
-        tabs.forEach((tab) => tab.classList.remove("active"));
-        if (selectedCookie) {
-          document.getElementById(selectedCookie).classList.add("active");
-        }
-      }
-    </script>
+    <div class="content">
+      <h1>Magic Candies Calculator</h1>
+      <div>
+        <label for="globalSugarCrystals">Sugar Crystals:</label>
+        <input
+          type="number"
+          id="globalSugarCrystals"
+          min="0"
+          value="0"
+          onchange="updateGlobalMaterials()"
+        />
+      </div>
+      <div>
+        <label for="globalSoulEssence">Soul Essence:</label>
+        <input
+          type="number"
+          id="globalSoulEssence"
+          min="0"
+          value="0"
+          onchange="updateGlobalMaterials()"
+        />
+      </div>
+      <div id="cookie_panels">
+        <script>
+          for (let i = 1; i <= 31; i++) {
+            document.write(`
+                        <div id="cookie_cookie${i}" class="cookie-panel">
+                            <h2>Cookie ${i}</h2>
+                            <label for="currentLevel_cookie${i}">Current Level:</label>
+                            <input type="number" id="currentLevel_cookie${i}" min="0" max="30" value="0" onchange="syncTargetWithCurrent('cookie${i}')">
+                            <label for="currentCandies_cookie${i}">Current Candies:</label>
+                            <input type="number" id="currentCandies_cookie${i}" min="0" value="0">
+                            <label for="targetLevel_cookie${i}">Target Level:</label>
+                            <button class="level-controls" id="decreaseLevel_cookie${i}" onclick="updateLevel('cookie${i}', -1)" disabled>-</button>
+                            <input type="number" id="targetLevel_cookie${i}" min="0" max="30" value="0" readonly>
+                            <button class="level-controls" onclick="updateLevel('cookie${i}', 1)">+</button>
+                            <p><button onclick="calculateCandies('cookie${i}')">Calculate</button></p>
+                            <div id="result_cookie${i}"></div>
+                        </div>
+                    `);
+          }
+        </script>
+      </div>
+    </div>
   </body>
 </html>
