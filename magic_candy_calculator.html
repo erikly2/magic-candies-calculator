@@ -5,17 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Magic Candies Calculator</title>
     <script>
+      const totalCookies = 33;
+
       const candiesRequired = {
-        10: 100,
-        20: 300,
-        30: 600,
+        1: 20,
+        2: 2,
+        3: 3,
+        4: 4,
+        5: 5,
+        6: 6,
+        7: 7,
+        8: 8,
+        9: 9,
+        10: 10,
       };
 
-      const materialsRequired = {
-        10: { sugarCrystals: 50, soulEssence: 20 },
-        20: { sugarCrystals: 150, soulEssence: 60 },
-        30: { sugarCrystals: 300, soulEssence: 120 },
-      };
+      const materialsRequired = {};
+
+      for (let level = 1; level <= 10; level++) {
+        materialsRequired[level] = {
+          sugarCrystals:
+            level === 1
+              ? 100
+              : level <= 6
+              ? 50 + (level - 2) * 4
+              : 71 + (level - 7) * 5, // Base 100 for level 1, +4 per level up to 5, then +5 per level for the next 5 levels
+          resonantIngredients: candiesRequired[level], // Same as candiesRequired for each level
+        };
+
+        // Soul Essence 1 logic:
+        if (level === 1) {
+          materialsRequired[level].soulEssence3 = 20; // Special case for level 1
+        } else {
+          if (level <= 9) {
+            materialsRequired[level].soulEssence1 =
+              20 + Math.floor((level - 1) / 2) * 4; // Base 20 for level 2, increments by 4 after every two levels
+          }
+        }
+      }
 
       let cookieData = {};
       let globalMaterials = {
@@ -29,15 +56,15 @@
           parseInt(document.getElementById("globalSugarCrystals2").value) || 0,
           parseInt(document.getElementById("globalSugarCrystals3").value) || 0,
         ];
-        globalMaterials.soulEssence = [
-          parseInt(document.getElementById("globalSoulEssence1").value) || 0,
-          parseInt(document.getElementById("globalSoulEssence2").value) || 0,
-          parseInt(document.getElementById("globalSoulEssence3").value) || 0,
-          parseInt(document.getElementById("globalSoulEssence4").value) || 0,
-        ];
+        globalMaterials.soulEssence1 =
+          parseInt(document.getElementById("globalSoulEssence1").value) || 0;
+        globalMaterials.soulEssence3 =
+          parseInt(document.getElementById("globalSoulEssence3").value) || 0;
       }
 
       function calculateCandies(cookie) {
+        updateGlobalMaterials();
+
         const currentLevel =
           parseInt(document.getElementById(`currentLevel_${cookie}`).value) ||
           0;
@@ -54,35 +81,39 @@
           return;
         }
 
-        const candiesNeeded =
+        let candiesNeeded =
           (candiesRequired[targetLevel] || 0) -
           (candiesRequired[currentLevel] || 0) -
           currentCandies;
-        const sugarCrystalsNeeded =
-          (materialsRequired[targetLevel]?.sugarCrystals || 0) -
-          (materialsRequired[currentLevel]?.sugarCrystals || 0);
-        const soulEssenceNeeded =
-          (materialsRequired[targetLevel]?.soulEssence || 0) -
-          (materialsRequired[currentLevel]?.soulEssence || 0);
+        let sugarCrystalsNeeded = 0;
+        let soulEssence1Needed = 0;
+        let soulEssence3Needed = 0;
+        let resonantIngredientsNeeded = 0;
 
-        const remainingSugarCrystals =
-          globalMaterials.sugarCrystals.reduce((acc, curr) => acc + curr, 0) -
-          sugarCrystalsNeeded;
-        const remainingSoulEssence =
-          globalMaterials.soulEssence.reduce((acc, curr) => acc + curr, 0) -
-          soulEssenceNeeded;
+        for (let lvl = currentLevel + 1; lvl <= targetLevel; lvl++) {
+          sugarCrystalsNeeded += materialsRequired[lvl]?.sugarCrystals || 0;
+          resonantIngredientsNeeded +=
+            materialsRequired[lvl]?.resonantIngredients || 0;
+          soulEssence1Needed += materialsRequired[lvl]?.soulEssence1 || 0;
+          soulEssence3Needed += materialsRequired[lvl]?.soulEssence3 || 0;
+        }
+        console.log("Current level:", currentLevel);
+        console.log("Target level:", targetLevel);
+        console.log("Candies needed:", candiesNeeded);
+        console.log("Sugar crystals needed:", sugarCrystalsNeeded);
+        console.log("Soul Essence needed:", soulEssence1Needed);
 
         document.getElementById(`result_${cookie}`).innerHTML = `
-                You need ${
-                  candiesNeeded > 0 ? candiesNeeded : 0
-                } more magic candies.<br>
-                You need ${
-                  sugarCrystalsNeeded > 0 ? sugarCrystalsNeeded : 0
-                } more Sugar Crystals (Remaining: ${remainingSugarCrystals}).<br>
-                You need ${
-                  soulEssenceNeeded > 0 ? soulEssenceNeeded : 0
-                } more Soul Essence (Remaining: ${remainingSoulEssence}).
-            `;
+                    You need ${
+                      candiesNeeded > 0 ? candiesNeeded : 0
+                    } more magic candies.<br>
+                    You need ${
+                      sugarCrystalsNeeded > 0 ? sugarCrystalsNeeded : 0
+                    } more Sugar Crystals.<br>
+                    You need ${
+                      soulEssence1Needed > 0 ? soulEssence1Needed : 0
+                    } more Soul Essence.
+                `;
       }
 
       function updateLevel(cookie, change) {
@@ -158,7 +189,7 @@
     <div class="sidebar">
       <h3>Cookies</h3>
       <script>
-        for (let i = 1; i <= 33; i++) {
+        for (let i = 1; i <= totalCookies; i++) {
           cookieData[`cookie${i}`] = {
             currentLevel: 0,
             targetLevel: 0,
@@ -247,7 +278,7 @@
 
       <div id="cookie_panels">
         <script>
-          for (let i = 1; i <= 33; i++) {
+          for (let i = 1; i <= totalCookies; i++) {
             document.write(`
                         <div id="cookie_cookie${i}" class="cookie-panel">
                             <h2>Cookie ${i}</h2>
