@@ -120,13 +120,17 @@
         //  (candiesRequired[targetLevel] || 0) -(candiesRequired[currentLevel] || 0) - currentCandies;
         let sugarCrystalsNeeded = 0;
         let soulEssence1Needed = 0;
+        let soulEssence2Needed = 0;
         let soulEssence3Needed = 0;
+        let soulEssence4Needed = 0;
         let resonantIngredientsNeeded = 0;
 
         for (let lvl = currentLevel + 1; lvl <= targetLevel; lvl++) {
           sugarCrystalsNeeded += materialsRequired[lvl]?.sugarCrystals || 0;
           soulEssence1Needed += materialsRequired[lvl]?.soulEssence1 || 0;
+          soulEssence2Needed += materialsRequired[lvl]?.soulEssence2 || 0;
           soulEssence3Needed += materialsRequired[lvl]?.soulEssence3 || 0;
+          soulEssence4Needed += materialsRequired[lvl]?.soulEssence4 || 0;
           candiesNeeded += candiesRequired[lvl] || 0;
         }
         candiesNeeded -= currentCandies;
