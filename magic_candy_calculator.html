@@ -87,8 +87,6 @@
       function updateGlobalMaterials() {
         globalMaterials.sugarCrystals = [
           parseInt(document.getElementById("globalSugarCrystals1").value) || 0,
-          parseInt(document.getElementById("globalSugarCrystals2").value) || 0,
-          parseInt(document.getElementById("globalSugarCrystals3").value) || 0,
         ];
         globalMaterials.soulEssence1 =
           parseInt(document.getElementById("globalSoulEssence1").value) || 0;
@@ -142,16 +140,31 @@
         console.log("Soul Essence needed:", soulEssence1Needed);
 
         document.getElementById(`result_${cookie}`).innerHTML = `
-                    You need ${
-                      candiesNeeded > 0 ? candiesNeeded : 0
-                    } more magic candies.<br>
-                    You need ${
-                      sugarCrystalsNeeded > 0 ? sugarCrystalsNeeded : 0
-                    } more Sugar Crystals.<br>
-                    You need ${
-                      soulEssence1Needed > 0 ? soulEssence1Needed : 0
-                    } more Soul Essence.
-                `;
+    ${
+      candiesNeeded > 0
+        ? `You need ${candiesNeeded} more magic candies.<br>`
+        : ""
+    }${
+          sugarCrystalsNeeded > 0
+            ? `You need ${sugarCrystalsNeeded} more Sugar Crystals.<br>`
+            : ""
+        }${
+          soulEssence1Needed > 0
+            ? `You need ${soulEssence1Needed} more Soul Essence.<br>`
+            : ""
+        }${
+          soulEssence2Needed > 0
+            ? `You need ${soulEssence2Needed} more Rare Soul Essence.<br>`
+            : ""
+        }${
+          soulEssence3Needed > 0
+            ? `You need ${soulEssence3Needed} more Epic Soul Essence.<br>`
+            : ""
+        }${
+          soulEssence4Needed > 0
+            ? `You need ${soulEssence4Needed} more Legendary Soul Essence.<br>`
+            : ""
+        }`;
       }
 
       function updateLevel(cookie, change) {
@@ -243,30 +256,10 @@
     <div class="content">
       <h1>Magic Candies Calculator</h1>
       <div>
-        <label for="globalSugarCrystals1">Sugar Crystals 1:</label>
+        <label for="globalSugarCrystals1">Sugar Crystals:</label>
         <input
           type="number"
           id="globalSugarCrystals1"
-          min="0"
-          value="0"
-          onchange="updateGlobalMaterials()"
-        />
-      </div>
-      <div>
-        <label for="globalSugarCrystals2">Sugar Crystals 2:</label>
-        <input
-          type="number"
-          id="globalSugarCrystals2"
-          min="0"
-          value="0"
-          onchange="updateGlobalMaterials()"
-        />
-      </div>
-      <div>
-        <label for="globalSugarCrystals3">Sugar Crystals 3:</label>
-        <input
-          type="number"
-          id="globalSugarCrystals3"
           min="0"
           value="0"
           onchange="updateGlobalMaterials()"
